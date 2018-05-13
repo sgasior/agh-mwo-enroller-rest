@@ -38,4 +38,11 @@ public class ParticipantService {
 		transaction.commit();
 	}
 
+	public void update(Participant participant) {
+		Transaction transaction = connector.getSession().beginTransaction();
+		connector.getSession().update(participant);
+		transaction.commit();
+
+	}
+
 }
