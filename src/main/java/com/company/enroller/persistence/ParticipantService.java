@@ -25,10 +25,17 @@ public class ParticipantService {
 	}
 
 	public void addParticipant(Participant participant) {
-		Transaction transaction= connector.getSession().beginTransaction();
+		Transaction transaction = connector.getSession().beginTransaction();
 		connector.getSession().save(participant);
 		transaction.commit();
 
+	}
+
+	public void deleteParticipantByLogin(String login) {
+		Participant participantToDelete = (Participant) connector.getSession().get(Participant.class, login);
+		Transaction transaction = connector.getSession().beginTransaction();
+		connector.getSession().delete(participantToDelete);
+		transaction.commit();
 	}
 
 }
