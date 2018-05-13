@@ -53,7 +53,7 @@ public class ParticipantRestController {
 
 	}
 
-	@RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteParticipant(@PathVariable("id") String login) {
 
 		// czy istnieje
