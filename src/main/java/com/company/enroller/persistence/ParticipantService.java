@@ -2,6 +2,7 @@ package com.company.enroller.persistence;
 
 import java.util.Collection;
 
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
 import com.company.enroller.model.Participant;
@@ -21,6 +22,13 @@ public class ParticipantService {
 
 	public Participant findByLogin(String login) {
 		return (Participant) connector.getSession().get(Participant.class, login);
+	}
+
+	public void addParticipant(Participant participant) {
+		Transaction transaction= connector.getSession().beginTransaction();
+		connector.getSession().save(participant);
+		transaction.commit();
+
 	}
 
 }
