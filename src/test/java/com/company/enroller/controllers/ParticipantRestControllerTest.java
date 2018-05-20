@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.company.enroller.model.Participant;
 import com.company.enroller.persistence.MeetingService;
 import com.company.enroller.persistence.ParticipantService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ParticipantRestController.class)
@@ -56,20 +59,46 @@ public class ParticipantRestControllerTest {
 		participant.setLogin("testlogin");
 		participant.setPassword("testpassword");
 		given(participantService.findByLogin(participant.getLogin())).willReturn(participant);
-		mvc.perform(get("/participants/testlogin").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).
-		andExpect(content().string("{\"login\":\"testlogin\",\"password\":\"testpassword\"}"));
+		mvc.perform(get("/participants/testlogin").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(content().string("{\"login\":\"testlogin\",\"password\":\"testpassword\"}"));
 	}
-	
-	
+
 	@Test
 	public void getNotExistingParticipant() throws Exception {
 
-		mvc.perform(get("/participants/testlogin").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound()).
-		andExpect(content().string(""));
+		mvc.perform(get("/participants/testlogin").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound()).andExpect(content().string(""));
 	}
-	
-	
-	
-	
+
+	@Test
+	public void deleteParticipant() throws Exception {
+
+		Participant participant = new Participant();
+		participant.setLogin("testlogin");
+		participant.setPassword("testpassword");
+		given(participantService.findByLogin(participant.getLogin())).willReturn(participant);
+		participantService.delete(participant);
+		mvc.perform(delete("/participants/testlogin").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNoContent()).andExpect(content().string(""));
+	}
+
+	@Test
+	public void deleteNotExistingParticipant() throws Exception {
+
+		mvc.perform(delete("/participants/testlogin").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound()).andExpect(content().string(""));
+	}
+
+	@Test
+	public void addParticipant() throws Exception {
+
+		Participant participant = new Participant();
+		participant.setLogin("testlogin");
+		participant.setPassword("testpassword");
+		String inputJSON = new ObjectMapper().writeValueAsString(participant);
+		// {\"login\":\"testlogin\",\"password\":\"testpassword\ tworzy to takiego json
+		mvc.perform(post("/participants").content(inputJSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(content().string(inputJSON)).andExpect(status().isCreated());
+	}
 
 }
